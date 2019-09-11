@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ангелина Игнатенко](https://up.htmlacademy.ru/javascript/18/user/1033877).
-* Наставник: `Неизвестно`.
+* Наставник: [Олег 'Rocket' Зубов](https://up.htmlacademy.ru/javascript/18/user/42701).
 
 ---
 
