@@ -29,11 +29,18 @@ var CHECK_TIME = [
 ];
 
 var ADVERT_ROOMS = [
-  '1 комната',
-  '2 комнаты',
-  '3 комнаты',
-  '100 комнат'
+  1,
+  2,
+  3,
+  100
 ];
+
+var ADVERT_APARTMENT = {
+  flat: 'Квартира',
+  bungalo: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец'
+};
 
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
@@ -85,7 +92,7 @@ function getAdvert(avatarNumber) {
     },
     offer: {
       title: 'Заголовок предложения',
-      address: locationX + ',' + locationY,
+      address: locationX + ', ' + locationY,
       price: getRandom(100, 5000),
       type: getRandomItemFromArray(ADVERT_TYPE),
       rooms: getRandomItemFromArray(ADVERT_ROOMS),
@@ -101,6 +108,11 @@ function getAdvert(avatarNumber) {
       y: locationY
     },
   };
+}
+
+var advertVariants = [];
+for (var k = 0; k < ADVERT_COUNT; k++) {
+  advertVariants[k] = getAdvert(k + 1);
 }
 
 var pinTemplate = document.querySelector('#pin')
@@ -123,8 +135,54 @@ var renderPin = function (advert) {
 
 var fragment = document.createDocumentFragment();
 for (var i = 0; i < ADVERT_COUNT; i++) {
-  fragment.appendChild(renderPin(getAdvert(i + 1)));
+  fragment.appendChild(renderPin(advertVariants[i]));
 }
 
 var pins = document.querySelector('.map__pins');
 pins.appendChild(fragment);
+
+var cardTemplate = document.querySelector('#card')
+.content
+.querySelector('.map__card');
+
+var renderCard = function (advertisment) {
+
+  var cardElement = cardTemplate.cloneNode(true);
+
+  cardElement.querySelector('.popup__title').textContent = advertisment.offer.title;
+  cardElement.querySelector('.popup__text--address').textContent = advertisment.offer.address;
+  cardElement.querySelector('.popup__text--price').textContent = advertisment.offer.price + '₽/ночь';
+  cardElement.querySelector('.popup__type').textContent = ADVERT_APARTMENT[advertisment.offer.type];
+  cardElement.querySelector('.popup__text--capacity').textContent = advertisment.offer.rooms + ' комнаты для ' + advertisment.offer.rooms + ' гостей';
+  cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + advertisment.offer.checkin + ' выезд до ' + advertisment.offer.checkout;
+  cardElement.querySelector('.popup__description').textContent = advertisment.offer.description;
+
+  var featuresList = cardElement.querySelector('.popup__features');
+  featuresList.innerHTML = '';
+  for (var q = 0; q < advertisment.offer.features.length; q++) {
+    var featuresElement = document.createElement('li');
+    featuresElement.classList.add('popup__feature', 'popup__feature--' + advertisment.offer.features[q]);
+    featuresList.appendChild(featuresElement);
+  }
+
+  var cardPhotos = cardElement.querySelector('.popup__photos');
+  cardPhotos.innerHTML = '';
+  for (var j = 0; j < advertisment.offer.photos.length; j++) {
+    var photosElement = document.createElement('img');
+    photosElement.classList.add('popup__photo' + advertisment.offer.photos[j]);
+    photosElement.src = advertisment.offer.photos[j];
+    photosElement.width = '45';
+    photosElement.height = '40';
+    photosElement.alt = 'Фотография жилья';
+    cardPhotos.appendChild(photosElement);
+  }
+
+  cardElement.querySelector('.popup__avatar').src = advertisment.author.avatar;
+
+  return cardElement;
+};
+
+var card = document.createDocumentFragment();
+card.appendChild(renderCard(advertVariants[0]));
+document.querySelector('.map').insertBefore(card, document.querySelector('.map__filters-container'));
+
