@@ -1,10 +1,26 @@
 'use strict';
 
+// ============ ПЕРЕМЕННЫЕ-КОНСТАНТЫ > ============ //
+
+var ROOMS_VS_GUESTS = {
+  1: [1],
+  2: [1, 2],
+  3: [1, 2, 3],
+  100: [0]
+};
+
+var ADVERT_MIN_PRICE = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000,
+};
+
 var ADVERT_TYPE = [
+  'bungalo',
   'palace',
   'flat',
-  'house',
-  'bungalo'
+  'house'
 ];
 
 var ADVERT_FEATURES = [
@@ -32,7 +48,7 @@ var ADVERT_ROOMS = [
   1,
   2,
   3,
-  100
+  0
 ];
 
 var ADVERT_APARTMENT = {
@@ -45,10 +61,17 @@ var ADVERT_APARTMENT = {
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65 + 22;
+
 var ADVERT_COUNT = 8;
 
-var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var ENTER_KEYCODE = 13;
+
+// ============ < ПЕРЕМЕННЫЕ-КОНСТАНТЫ ============ //
+
+
+// ============ ФУНКЦИИ > ============ //
 
 function getRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -60,26 +83,19 @@ function getRandomItemFromArray(arr) {
 
 function getRandomLengthArray(array) {
   var tempArray = [];
-  var isExist = false;
+  array.sort(function () {
+    return Math.random() - 0.5;
+  });
 
   for (var i = 0; i < getRandom(1, array.length); i++) {
-    tempArray[i] = getRandomItemFromArray(array);
-
-    for (var j = 0; j < i; j++) {
-      if (tempArray[j] === tempArray[i]) {
-        isExist = true;
-      }
-
-      if (isExist) {
-        --i;
-        isExist = false;
-      }
-    }
+    tempArray[i] = array[i];
   }
+
   return tempArray;
 }
 
 function getAdvert(avatarNumber) {
+  var map = document.querySelector('.map');
   var locationX = getRandom(0, map.offsetWidth);
   var locationY = getRandom(130, 630);
 
@@ -110,16 +126,8 @@ function getAdvert(avatarNumber) {
   };
 }
 
-var advertVariants = [];
-for (var k = 0; k < ADVERT_COUNT; k++) {
-  advertVariants[k] = getAdvert(k + 1);
-}
-
-var pinTemplate = document.querySelector('#pin')
-.content
-.querySelector('.map__pin');
-
 var renderPin = function (advert) {
+  var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
   var pinElement = pinTemplate.cloneNode(true);
 
   pinElement.style.left = advert.location.x - PIN_WIDTH / 2 + 'px';
@@ -133,20 +141,8 @@ var renderPin = function (advert) {
   return pinElement;
 };
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < ADVERT_COUNT; i++) {
-  fragment.appendChild(renderPin(advertVariants[i]));
-}
-
-var pins = document.querySelector('.map__pins');
-pins.appendChild(fragment);
-
-var cardTemplate = document.querySelector('#card')
-.content
-.querySelector('.map__card');
-
 var renderCard = function (advertisment) {
-
+  var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var cardElement = cardTemplate.cloneNode(true);
 
   cardElement.querySelector('.popup__title').textContent = advertisment.offer.title;
@@ -159,9 +155,9 @@ var renderCard = function (advertisment) {
 
   var featuresList = cardElement.querySelector('.popup__features');
   featuresList.innerHTML = '';
-  for (var q = 0; q < advertisment.offer.features.length; q++) {
+  for (var i = 0; i < advertisment.offer.features.length; i++) {
     var featuresElement = document.createElement('li');
-    featuresElement.classList.add('popup__feature', 'popup__feature--' + advertisment.offer.features[q]);
+    featuresElement.classList.add('popup__feature', 'popup__feature--' + advertisment.offer.features[i]);
     featuresList.appendChild(featuresElement);
   }
 
@@ -169,7 +165,7 @@ var renderCard = function (advertisment) {
   cardPhotos.innerHTML = '';
   for (var j = 0; j < advertisment.offer.photos.length; j++) {
     var photosElement = document.createElement('img');
-    photosElement.classList.add('popup__photo' + advertisment.offer.photos[j]);
+    photosElement.classList.add('popup__photo');
     photosElement.src = advertisment.offer.photos[j];
     photosElement.width = '45';
     photosElement.height = '40';
@@ -182,7 +178,123 @@ var renderCard = function (advertisment) {
   return cardElement;
 };
 
-var card = document.createDocumentFragment();
-card.appendChild(renderCard(advertVariants[0]));
-document.querySelector('.map').insertBefore(card, document.querySelector('.map__filters-container'));
+function mapVisible() {
+  var map = document.querySelector('.map');
+  map.classList.remove('map--faded');
 
+  var pins = document.querySelector('.map__pins');
+  pins.appendChild(mapFragments);
+
+  // document.querySelector('.map').insertBefore(mapFragments, document.querySelector('.map__filters-container'));
+
+  setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_HEIGHT));
+
+  /* var pin = pins.querySelectorAll('.map__pin');
+  for (var i = 1; i < pin.length; i++) {
+    pin[i].addEventListener('click', function () {
+
+    });
+  } */
+}
+
+function setAddressInput(x, y) {
+  document.querySelector('#address')
+.value = (+mainPin.style.left.replace('px', '') + x) + ', ' + (+mainPin.style.top.replace('px', '') + y);
+}
+
+function adFormDisabled(Status) {
+  var adForm = document.querySelector('.ad-form');
+  var adFormFieldset = adForm.querySelectorAll('fieldset');
+  if (!Status) {
+    adForm.classList.toggle('ad-form--disabled');
+  }
+  for (var i = 0; i < adFormFieldset.length; i++) {
+    adFormFieldset[i].disabled = Status;
+  }
+}
+
+// ============ < ФУНКЦИИ ============ //
+
+
+// ============ ОБРАБОТЧИКИ СОБЫТИЙ и ПЕРЕМЕННЫЕ-DOM-ЭЛЕМЕНТЫ > ============ //
+
+var mainPin = document.querySelector('.map__pin--main');
+
+mainPin.addEventListener('mousedown', function () {
+  adFormDisabled(false);
+  mapVisible();
+});
+
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    adFormDisabled(false);
+    mapVisible();
+  }
+});
+
+var adFormType = document.querySelector('#type');
+var adFormPrice = document.querySelector('#price');
+var adFormTimeIn = document.querySelector('#timein');
+var adFormTimeOut = document.querySelector('#timeout');
+var adFormRoomNumber = document.querySelector('#room_number');
+var adFormCapacity = document.querySelector('#capacity');
+
+adFormType.addEventListener('input', function () {
+  for (var key in ADVERT_APARTMENT) {
+    if (adFormType.value === key) {
+      adFormPrice.placeholder = ADVERT_MIN_PRICE[key];
+      adFormPrice.min = ADVERT_MIN_PRICE[key];
+    }
+  }
+});
+
+adFormTimeIn.addEventListener('change', function () {
+  for (var i = 0; i < CHECK_TIME.length; i++) {
+    if (adFormTimeIn.value === CHECK_TIME[i]) {
+      adFormTimeOut.value = CHECK_TIME[i];
+    }
+  }
+});
+
+adFormTimeOut.addEventListener('change', function () {
+  for (var i = 0; i < CHECK_TIME.length; i++) {
+    if (adFormTimeOut.value === CHECK_TIME[i]) {
+      adFormTimeIn.value = CHECK_TIME[i];
+    }
+  }
+});
+
+adFormRoomNumber.addEventListener('change', function () {
+  var tempArray = ROOMS_VS_GUESTS[adFormRoomNumber.value];
+
+  for (var i = 0; i < adFormCapacity.length; i++) {
+    adFormCapacity[i].disabled = true;
+    for (var j = 0; j < tempArray.length; j++) {
+      if (+adFormCapacity[i].value === tempArray[j]) {
+        adFormCapacity[i].disabled = false;
+      }
+    }
+  }
+});
+
+var adFormAddress = document.querySelector('#address');
+
+// ============ < ОБРАБОТЧИКИ СОБЫТИЙ и ПЕРЕМЕННЫЕ-DOM-ЭЛЕМЕНТЫ ============ //
+
+
+// ============ ИСПОЛНЯЕМЫЙ КОД > ============ //
+
+adFormDisabled(true);
+
+setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
+adFormAddress.disabled = true;
+
+var mapFragments = document.createDocumentFragment();
+var advertVariants = [];
+for (var i = 0; i < ADVERT_COUNT; i++) {
+  advertVariants[i] = getAdvert(i + 1);
+  mapFragments.appendChild(renderPin(advertVariants[i]));
+}
+mapFragments.appendChild(renderCard(advertVariants[0]));
+
+// ============ < ИСПОЛНЯЕМЫЙ КОД ============ //
