@@ -67,7 +67,7 @@ var MAIN_PIN_HEIGHT = 65 + 22;
 var ADVERT_COUNT = 8;
 
 var ENTER_KEYCODE = 13;
-// var ESC_KEYCODE = 27;
+var ESC_KEYCODE = 27;
 
 var disabledStatusForm = true;
 
@@ -191,22 +191,37 @@ function mapVisible() {
   setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_HEIGHT));
 
   var cardsFragment = document.createDocumentFragment();
+  var card = null;
+
+  var closeCard = function () {
+    map.removeChild(card);
+    card = null;
+  };
+
   var pin = pins.querySelectorAll('.map__pin');
   var id;
 
   for (var i = 1; i < pin.length; i++) {
     pin[i].dataset.id = i;
     pin[i].addEventListener('click', function (evt) {
+      if (card !== null) {
+        closeCard();
+      }
       id = evt.target.closest('.map__pin').dataset.id;
       cardsFragment.appendChild(renderCard(advertVariants[id - 1]));
       document.querySelector('.map').insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
-      var card = document.querySelector('.map__card');
+      card = document.querySelector('.map__card');
       var cardCloseButton = document.querySelector('.popup__close');
       cardCloseButton.addEventListener('click', function () {
-        map.removeChild(card);
+        closeCard();
       });
     });
   }
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      closeCard();
+    }
+  });
 }
 
 function setAddressInput(x, y) {
@@ -228,8 +243,37 @@ function adFormDisabled(status) {
 
 var mapRender = function () {
   if (!disabledStatusForm) {
-    adFormDisabled(disabledStatusForm); // делаем форму активной,
-    mapVisible(); // а карту видимой
+    adFormDisabled(disabledStatusForm);
+    mapVisible();
+  }
+};
+
+var adFormTypeValidity = function () {
+  for (var key in ADVERT_APARTMENT) {
+    if (adFormType.value === key) {
+      adFormPrice.placeholder = ADVERT_MIN_PRICE[key];
+      adFormPrice.min = ADVERT_MIN_PRICE[key];
+    }
+  }
+};
+
+var adFormRoomNumberValidity = function () {
+  var tempArray = ROOMS_VS_GUESTS[adFormRoomNumber.value];
+  for (var i = 0; i < adFormCapacity.length; i++) {
+    adFormCapacity[i].disabled = true;
+    for (var j = 0; j < tempArray.length; j++) {
+      if (+adFormCapacity[i].value === tempArray[j]) {
+        adFormCapacity[i].disabled = false;
+      }
+    }
+  }
+};
+
+var adFormTimeValidity = function (shiftTimeIn, shiftTimeOut) {
+  for (var i = 0; i < CHECK_TIME.length; i++) {
+    if (shiftTimeIn.value === CHECK_TIME[i]) {
+      shiftTimeOut.value = CHECK_TIME[i];
+    }
   }
 };
 
@@ -258,41 +302,19 @@ var adFormRoomNumber = document.querySelector('#room_number');
 var adFormCapacity = document.querySelector('#capacity');
 
 adFormType.addEventListener('input', function () {
-  for (var key in ADVERT_APARTMENT) {
-    if (adFormType.value === key) {
-      adFormPrice.placeholder = ADVERT_MIN_PRICE[key];
-      adFormPrice.min = ADVERT_MIN_PRICE[key];
-    }
-  }
+  adFormTypeValidity();
 });
 
 adFormTimeIn.addEventListener('change', function () {
-  for (var i = 0; i < CHECK_TIME.length; i++) {
-    if (adFormTimeIn.value === CHECK_TIME[i]) {
-      adFormTimeOut.value = CHECK_TIME[i];
-    }
-  }
+  adFormTimeValidity(adFormTimeIn, adFormTimeOut);
 });
 
 adFormTimeOut.addEventListener('change', function () {
-  for (var i = 0; i < CHECK_TIME.length; i++) {
-    if (adFormTimeOut.value === CHECK_TIME[i]) {
-      adFormTimeIn.value = CHECK_TIME[i];
-    }
-  }
+  adFormTimeValidity(adFormTimeOut, adFormTimeIn);
 });
 
 adFormRoomNumber.addEventListener('change', function () {
-  var tempArray = ROOMS_VS_GUESTS[adFormRoomNumber.value];
-
-  for (var i = 0; i < adFormCapacity.length; i++) {
-    adFormCapacity[i].disabled = true;
-    for (var j = 0; j < tempArray.length; j++) {
-      if (+adFormCapacity[i].value === tempArray[j]) {
-        adFormCapacity[i].disabled = false;
-      }
-    }
-  }
+  adFormRoomNumberValidity();
 });
 
 var adFormAddress = document.querySelector('#address');
@@ -303,6 +325,8 @@ var adFormAddress = document.querySelector('#address');
 // ============ ИСПОЛНЯЕМЫЙ КОД > ============ //
 
 adFormDisabled(disabledStatusForm);
+adFormRoomNumberValidity();
+adFormTypeValidity();
 
 setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
 adFormAddress.disabled = true;
