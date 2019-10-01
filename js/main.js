@@ -67,6 +67,9 @@ var MAIN_PIN_HEIGHT = 65 + 22;
 var ADVERT_COUNT = 8;
 
 var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+
+var disabledStatusForm = true;
 
 // ============ < ПЕРЕМЕННЫЕ-КОНСТАНТЫ ============ //
 
@@ -185,16 +188,25 @@ function mapVisible() {
   var pins = document.querySelector('.map__pins');
   pins.appendChild(mapFragments);
 
-  // document.querySelector('.map').insertBefore(mapFragments, document.querySelector('.map__filters-container'));
-
   setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_HEIGHT));
 
-  /* var pin = pins.querySelectorAll('.map__pin');
-  for (var i = 1; i < pin.length; i++) {
-    pin[i].addEventListener('click', function () {
+  var cardsFragment = document.createDocumentFragment();
+  var pin = pins.querySelectorAll('.map__pin');
+  var id;
 
+  for (var i = 1; i < pin.length; i++) {
+    pin[i].dataset.id = i;
+    pin[i].addEventListener('click', function (evt) {
+      id = evt.target.closest('.map__pin').dataset.id;
+      cardsFragment.appendChild(renderCard(advertVariants[id - 1]));
+      document.querySelector('.map').insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
+      var card = document.querySelector('.map__card');
+      var cardCloseButton = document.querySelector('.popup__close');
+      cardCloseButton.addEventListener('click', function () {
+        map.removeChild(card);
+      });
     });
-  } */
+  }
 }
 
 function setAddressInput(x, y) {
@@ -202,16 +214,24 @@ function setAddressInput(x, y) {
 .value = (+mainPin.style.left.replace('px', '') + x) + ', ' + (+mainPin.style.top.replace('px', '') + y);
 }
 
-function adFormDisabled(Status) {
+function adFormDisabled(status) {
   var adForm = document.querySelector('.ad-form');
   var adFormFieldset = adForm.querySelectorAll('fieldset');
-  if (!Status) {
+  if (!status) {
     adForm.classList.toggle('ad-form--disabled');
   }
   for (var i = 0; i < adFormFieldset.length; i++) {
-    adFormFieldset[i].disabled = Status;
+    adFormFieldset[i].disabled = status;
   }
+  disabledStatusForm = !status;
 }
+
+var mapRender = function () {
+  if (!disabledStatusForm) {
+    adFormDisabled(disabledStatusForm); // делаем форму активной,
+    mapVisible(); // а карту видимой
+  }
+};
 
 // ============ < ФУНКЦИИ ============ //
 
@@ -221,14 +241,12 @@ function adFormDisabled(Status) {
 var mainPin = document.querySelector('.map__pin--main');
 
 mainPin.addEventListener('mousedown', function () {
-  adFormDisabled(false);
-  mapVisible();
+  mapRender();
 });
 
 mainPin.addEventListener('keydown', function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
-    adFormDisabled(false);
-    mapVisible();
+    mapRender();
   }
 });
 
@@ -284,7 +302,7 @@ var adFormAddress = document.querySelector('#address');
 
 // ============ ИСПОЛНЯЕМЫЙ КОД > ============ //
 
-adFormDisabled(true);
+adFormDisabled(disabledStatusForm);
 
 setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
 adFormAddress.disabled = true;
@@ -295,6 +313,5 @@ for (var i = 0; i < ADVERT_COUNT; i++) {
   advertVariants[i] = getAdvert(i + 1);
   mapFragments.appendChild(renderPin(advertVariants[i]));
 }
-mapFragments.appendChild(renderCard(advertVariants[0]));
 
 // ============ < ИСПОЛНЯЕМЫЙ КОД ============ //
