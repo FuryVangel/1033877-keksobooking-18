@@ -61,6 +61,9 @@ var ADVERT_APARTMENT = {
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65 + 22;
+
 var ADVERT_COUNT = 8;
 
 var ENTER_KEYCODE = 13;
@@ -184,20 +187,29 @@ function mapVisible() {
 
   // document.querySelector('.map').insertBefore(mapFragments, document.querySelector('.map__filters-container'));
 
-  document.querySelector('#address')
-  .value = (+mainPin.style.left.replace('px', '') + PIN_WIDTH / 2) + ', ' + (+mainPin.style.top.replace('px', '') + PIN_HEIGHT);
+  setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_HEIGHT));
+
+  /* var pin = pins.querySelectorAll('.map__pin');
+  for (var i = 1; i < pin.length; i++) {
+    pin[i].addEventListener('click', function () {
+
+    });
+  } */
 }
 
-function adFormDisabled(trueOrFalse) {
+function setAddressInput(x, y) {
+  document.querySelector('#address')
+.value = (+mainPin.style.left.replace('px', '') + x) + ', ' + (+mainPin.style.top.replace('px', '') + y);
+}
+
+function adFormDisabled(Status) {
   var adForm = document.querySelector('.ad-form');
   var adFormFieldset = adForm.querySelectorAll('fieldset');
-  if (trueOrFalse === false) {
-    adForm.classList.remove('ad-form--disabled');
-  } else {
-    adForm.classList.add('ad-form--disabled');
+  if (!Status) {
+    adForm.classList.toggle('ad-form--disabled');
   }
   for (var i = 0; i < adFormFieldset.length; i++) {
-    adFormFieldset[i].disabled = trueOrFalse;
+    adFormFieldset[i].disabled = Status;
   }
 }
 
@@ -274,7 +286,7 @@ var adFormAddress = document.querySelector('#address');
 
 adFormDisabled(true);
 
-adFormAddress.value = (+mainPin.style.left.replace('px', '') + PIN_WIDTH / 2) + ', ' + (+mainPin.style.top.replace('px', '') + PIN_WIDTH / 2); // в инпуте "Адрес" (id = '#address') устанавливаем координаты центра пина
+setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
 adFormAddress.disabled = true;
 
 var mapFragments = document.createDocumentFragment();
