@@ -71,6 +71,8 @@ var ESC_KEYCODE = 27;
 
 var disabledStatusForm = true;
 
+var map = document.querySelector('.map');
+
 // ============ < ПЕРЕМЕННЫЕ-КОНСТАНТЫ ============ //
 
 
@@ -98,7 +100,6 @@ function getRandomLengthArray(array) {
 }
 
 function getAdvert(avatarNumber) {
-  var map = document.querySelector('.map');
   var locationX = getRandom(0, map.offsetWidth);
   var locationY = getRandom(130, 630);
 
@@ -182,35 +183,32 @@ var renderCard = function (advertisment) {
 };
 
 function mapVisible() {
-  var map = document.querySelector('.map');
   map.classList.remove('map--faded');
 
   var pins = document.querySelector('.map__pins');
   pins.appendChild(mapFragments);
+  var pin = pins.querySelectorAll('.map__pin');
 
-  setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_HEIGHT));
+  setAddressInput((MAIN_PIN_WIDTH / 2), MAIN_PIN_HEIGHT);
 
   var cardsFragment = document.createDocumentFragment();
-  var card = null;
 
   var closeCard = function () {
-    map.removeChild(card);
-    card = null;
+    var card = false || document.querySelector('.map__card');
+    if (card) {
+      map.removeChild(card);
+    }
   };
-
-  var pin = pins.querySelectorAll('.map__pin');
-  var id;
 
   for (var i = 1; i < pin.length; i++) {
     pin[i].dataset.id = i;
     pin[i].addEventListener('click', function (evt) {
-      if (card !== null) {
-        closeCard();
-      }
-      id = evt.target.closest('.map__pin').dataset.id;
+      closeCard();
+
+      var id = evt.target.closest('.map__pin').dataset.id;
       cardsFragment.appendChild(renderCard(advertVariants[id - 1]));
-      document.querySelector('.map').insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
-      card = document.querySelector('.map__card');
+      map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
+
       var cardCloseButton = document.querySelector('.popup__close');
       cardCloseButton.addEventListener('click', function () {
         closeCard();
@@ -226,12 +224,17 @@ function mapVisible() {
 
 function setAddressInput(x, y) {
   document.querySelector('#address')
-.value = (+mainPin.style.left.replace('px', '') + x) + ', ' + (+mainPin.style.top.replace('px', '') + y);
+  .value = (parseInt(mainPin.style.left, 10) + x) + ', ' + (parseInt(mainPin.style.top, 10) + y);
 }
 
 function adFormDisabled(status) {
   var adForm = document.querySelector('.ad-form');
   var adFormFieldset = adForm.querySelectorAll('fieldset');
+  var mapFiltersFormFieldset = document.querySelector('.map__filters').querySelectorAll('select, fieldset');
+  mapFiltersFormFieldset.forEach(function (item) {
+    item.disabled = status;
+  });
+
   if (!status) {
     adForm.classList.toggle('ad-form--disabled');
   }
@@ -300,6 +303,7 @@ var adFormTimeIn = document.querySelector('#timein');
 var adFormTimeOut = document.querySelector('#timeout');
 var adFormRoomNumber = document.querySelector('#room_number');
 var adFormCapacity = document.querySelector('#capacity');
+var adFormAddress = document.querySelector('#address');
 
 adFormType.addEventListener('input', function () {
   adFormTypeValidity();
@@ -317,7 +321,6 @@ adFormRoomNumber.addEventListener('change', function () {
   adFormRoomNumberValidity();
 });
 
-var adFormAddress = document.querySelector('#address');
 
 // ============ < ОБРАБОТЧИКИ СОБЫТИЙ и ПЕРЕМЕННЫЕ-DOM-ЭЛЕМЕНТЫ ============ //
 
@@ -327,6 +330,7 @@ var adFormAddress = document.querySelector('#address');
 adFormDisabled(disabledStatusForm);
 adFormRoomNumberValidity();
 adFormTypeValidity();
+
 
 setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
 adFormAddress.disabled = true;
