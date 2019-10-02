@@ -187,39 +187,8 @@ function mapVisible() {
 
   var pins = document.querySelector('.map__pins');
   pins.appendChild(mapFragments);
-  var pin = pins.querySelectorAll('.map__pin');
 
   setAddressInput((MAIN_PIN_WIDTH / 2), MAIN_PIN_HEIGHT);
-
-  var cardsFragment = document.createDocumentFragment();
-
-  var closeCard = function () {
-    var card = false || document.querySelector('.map__card');
-    if (card) {
-      map.removeChild(card);
-    }
-  };
-
-  for (var i = 1; i < pin.length; i++) {
-    pin[i].dataset.id = i;
-    pin[i].addEventListener('click', function (evt) {
-      closeCard();
-
-      var id = evt.target.closest('.map__pin').dataset.id;
-      cardsFragment.appendChild(renderCard(advertVariants[id - 1]));
-      map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
-
-      var cardCloseButton = document.querySelector('.popup__close');
-      cardCloseButton.addEventListener('click', function () {
-        closeCard();
-      });
-    });
-  }
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeCard();
-    }
-  });
 }
 
 function setAddressInput(x, y) {
@@ -321,7 +290,6 @@ adFormRoomNumber.addEventListener('change', function () {
   adFormRoomNumberValidity();
 });
 
-
 // ============ < ОБРАБОТЧИКИ СОБЫТИЙ и ПЕРЕМЕННЫЕ-DOM-ЭЛЕМЕНТЫ ============ //
 
 
@@ -336,10 +304,37 @@ setAddressInput((MAIN_PIN_WIDTH / 2), (MAIN_PIN_WIDTH / 2));
 adFormAddress.disabled = true;
 
 var mapFragments = document.createDocumentFragment();
+var cardsFragment = document.createDocumentFragment();
 var advertVariants = [];
+
 for (var i = 0; i < ADVERT_COUNT; i++) {
+
   advertVariants[i] = getAdvert(i + 1);
   mapFragments.appendChild(renderPin(advertVariants[i]));
+
+  mapFragments.childNodes[i].dataset.id = i + 1;
+  mapFragments.childNodes[i].addEventListener('click', function (evt) {
+    var closeCard = function () {
+      var card = document.querySelector('.map__card');
+      if (card) {
+        map.removeChild(card);
+      }
+    };
+    closeCard();
+
+    var id = evt.target.closest('.map__pin').dataset.id;
+    cardsFragment.appendChild(renderCard(advertVariants[id - 1]));
+
+    map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
+
+    var cardCloseButton = document.querySelector('.popup__close');
+    cardCloseButton.addEventListener('mousedown', closeCard);
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode === ESC_KEYCODE) {
+        closeCard();
+      }
+    });
+  });
 }
 
 // ============ < ИСПОЛНЯЕМЫЙ КОД ============ //
