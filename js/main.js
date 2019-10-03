@@ -204,9 +204,8 @@ function adFormDisabled(status) {
     item.disabled = status;
   });
 
-  if (!status) {
-    adForm.classList.toggle('ad-form--disabled');
-  }
+  adForm.classList.toggle('ad-form--disabled', status);
+
   for (var i = 0; i < adFormFieldset.length; i++) {
     adFormFieldset[i].disabled = status;
   }
