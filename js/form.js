@@ -70,7 +70,7 @@
 
   var setAddressInput = function (x, y) {
     document.querySelector('#address')
-    .value = (parseInt(window.mainPin.style.left, 10) + x) + ', ' + (parseInt(window.mainPin.style.top, 10) + y);
+    .value = Math.floor(parseInt(window.mainPin.style.left, 10) + x) + ', ' + Math.floor(parseInt(window.mainPin.style.top, 10) + y);
   };
 
   var adFormDisabled = function (status) {
