@@ -5,7 +5,7 @@
   window.ESC_KEYCODE = 27;
 
   window.MAIN_PIN_WIDTH = 65;
-  window.MAIN_PIN_HEIGHT = 65 + 22;
+  window.MAIN_PIN_HEIGHT = 65 + 16;
 
   window.ADVERT_APARTMENT = {
     flat: 'Квартира',
