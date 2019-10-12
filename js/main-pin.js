@@ -22,16 +22,16 @@
           x = -window.MAIN_PIN_WIDTH / 2;
         }
 
-        if (y < 0) {
-          y = 0;
+        if (y < window.HEIGHT_LIMIT.min - window.MAIN_PIN_HEIGHT) {
+          y = window.HEIGHT_LIMIT.min - window.MAIN_PIN_HEIGHT;
         }
 
         if (x > window.map.offsetWidth - window.MAIN_PIN_WIDTH / 2) {
           x = window.map.offsetWidth - window.MAIN_PIN_WIDTH / 2;
         }
 
-        if (y > window.map.offsetHeight - window.MAIN_PIN_HEIGHT) {
-          y = window.map.offsetHeight - window.MAIN_PIN_HEIGHT;
+        if (y > window.HEIGHT_LIMIT.max - window.MAIN_PIN_HEIGHT) {
+          y = window.HEIGHT_LIMIT.max - window.MAIN_PIN_HEIGHT;
         }
 
         window.mainPin.style.top = y + 'px';
