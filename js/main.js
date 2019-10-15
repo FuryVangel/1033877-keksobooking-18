@@ -7,10 +7,9 @@
   var mapVisible = function () {
     window.map.classList.remove('map--faded');
 
-    var pins = document.querySelector('.map__pins');
-    pins.appendChild(mapFragments);
-
     window.setAddressInput((window.MAIN_PIN_WIDTH / 2), window.MAIN_PIN_HEIGHT);
+
+    window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
   };
 
   window.mapRender = function () {
@@ -29,26 +28,23 @@
     document.querySelector('main').appendChild(errorElement);
   };
 
+  window.closeCard = function () {
+    var card = document.querySelector('.map__card');
+    if (card) {
+      window.map.removeChild(card);
+    }
+  };
+
   var onSuccess = function (data) {
     var advertVariants = data;
 
-    // var ADVERT_COUNT = 8;
-
-    // var advertVariants = [];
-
     for (var i = 0; i < advertVariants.length; i++) {
-      // advertVariants[i] = window.getAdvert(i + 1);
       if (advertVariants[i].offer) {
         mapFragments.appendChild(window.pins.renderPins(advertVariants[i]));
         mapFragments.childNodes[i].dataset.id = i + 1;
         mapFragments.childNodes[i].addEventListener('click', function (evt) {
-          var closeCard = function () {
-            var card = document.querySelector('.map__card');
-            if (card) {
-              window.map.removeChild(card);
-            }
-          };
-          closeCard();
+
+          window.closeCard();
 
           var id = evt.target.closest('.map__pin').dataset.id;
           cardsFragment.appendChild(window.renderCard(advertVariants[id - 1]));
@@ -56,16 +52,16 @@
           window.map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
 
           var cardCloseButton = document.querySelector('.popup__close');
-          cardCloseButton.addEventListener('mousedown', closeCard);
+          cardCloseButton.addEventListener('mousedown', window.closeCard);
           document.addEventListener('keydown', function (e) {
             if (e.keyCode === window.ESC_KEYCODE) {
-              closeCard();
+              window.closeCard();
             }
           });
         });
       }
     }
+    var pins = document.querySelector('.map__pins');
+    pins.appendChild(mapFragments);
   };
-
-  window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
 })();
