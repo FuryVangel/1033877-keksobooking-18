@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var PINS_LIMIT = 5;
+
   var mapFragments = document.createDocumentFragment();
   var cardsFragment = document.createDocumentFragment();
 
@@ -36,15 +38,18 @@
   };
 
   var onSuccess = function (data) {
-    var advertVariants = data.slice(0, 5);
+    var advertVariants = data.slice(0, PINS_LIMIT);
     var inputType = document.querySelector('#housing-type');
     inputType.addEventListener('change', function () {
-      var adFilteredElement = advertVariants.filter(function (advertElement) {
+      var adFilteredElement = data
+      .filter(function (advertElement) {
         if (advertElement.offer.type === inputType.value) {
           return true;
         }
         return inputType.value === 'any';
-      });
+      })
+      .slice(0, PINS_LIMIT);
+
       var pins = document.querySelectorAll('.map__pin');
       for (var i = 1; i < pins.length; i++) {
         pins[i].remove();
