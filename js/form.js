@@ -134,10 +134,20 @@
     adFormTitle.value = '';
     adFormDescription.value = '';
     adFormPrice.value = '';
-
+    adFormDisabled(window.disabledStatusForm);
     mapFaded();
     window.closeCard();
-    adFormDisabled(window.disabledStatusForm);
+
+    document.addEventListener('click', function () {
+      successElement.remove();
+      errorElement.remove();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode === window.ESC_KEYCODE) {
+        successElement.remove();
+        errorElement.remove();
+      }
+    });
   };
 
   var mapFaded = function () {
