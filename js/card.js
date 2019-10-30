@@ -15,23 +15,23 @@
 
     var featuresList = cardElement.querySelector('.popup__features');
     featuresList.innerHTML = '';
-    for (var i = 0; i < advertisment.offer.features.length; i++) {
+    advertisment.offer.features.forEach(function (feature) {
       var featuresElement = document.createElement('li');
-      featuresElement.classList.add('popup__feature', 'popup__feature--' + advertisment.offer.features[i]);
+      featuresElement.classList.add('popup__feature', 'popup__feature--' + feature);
       featuresList.appendChild(featuresElement);
-    }
+    });
 
     var cardPhotos = cardElement.querySelector('.popup__photos');
     cardPhotos.innerHTML = '';
-    for (var j = 0; j < advertisment.offer.photos.length; j++) {
+    advertisment.offer.photos.forEach(function (photo) {
       var photosElement = document.createElement('img');
       photosElement.classList.add('popup__photo');
-      photosElement.src = advertisment.offer.photos[j];
+      photosElement.src = photo;
       photosElement.width = '45';
       photosElement.height = '40';
       photosElement.alt = 'Фотография жилья';
       cardPhotos.appendChild(photosElement);
-    }
+    });
 
     cardElement.querySelector('.popup__avatar').src = advertisment.author.avatar;
 

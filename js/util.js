@@ -5,7 +5,7 @@
   window.ESC_KEYCODE = 27;
 
   window.MAIN_PIN_WIDTH = 65;
-  window.MAIN_PIN_HEIGHT = 65 + 16;
+  window.MAIN_PIN_HEIGHT = 81;
 
   window.HEIGHT_LIMIT = {
     min: 130,

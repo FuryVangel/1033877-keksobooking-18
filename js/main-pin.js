@@ -8,7 +8,6 @@
 
     evt.preventDefault();
 
-    window.mainPin.style.zIndex = 2;
     var shiftX = evt.pageX - window.mainPin.offsetLeft - window.map.offsetLeft;
     var shiftY = evt.pageY - window.mainPin.offsetTop - window.map.offsetTop;
 
