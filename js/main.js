@@ -31,9 +31,17 @@
   };
 
   window.closeCard = function () {
+    desactivatedPins();
     var card = document.querySelector('.map__card');
     if (card) {
       window.map.removeChild(card);
+    }
+  };
+
+  var desactivatedPins = function () {
+    var pins = document.querySelectorAll('.map__pin');
+    for (var i = 1; i < pins.length; i++) {
+      pins[i].classList.remove('map__pin--active');
     }
   };
 
@@ -42,16 +50,17 @@
     var advertVariants = data.slice(0, window.PINS_LIMIT);
 
     window.drawingPins = function (adVariants) {
-      for (var i = 0; i < adVariants.length; i++) {
-        if (adVariants[i].offer) {
-          mapFragments.appendChild(window.pins.renderPins(adVariants[i]));
-          mapFragments.childNodes[i].dataset.id = i + 1;
+      adVariants.forEach(function (advert, i) {
+        if (advert.offer) {
+          mapFragments.appendChild(window.pins.renderPins(advert));
           mapFragments.childNodes[i].addEventListener('click', function (evt) {
 
             window.closeCard();
 
-            var id = evt.target.closest('.map__pin').dataset.id;
-            cardsFragment.appendChild(window.renderCard(adVariants[id - 1]));
+            var pin = evt.target.closest('.map__pin');
+            pin.classList.add('map__pin--active');
+
+            cardsFragment.appendChild(window.renderCard(advert));
 
             window.map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
 
@@ -64,7 +73,7 @@
             });
           });
         }
-      }
+      });
       var pins = document.querySelector('.map__pins');
       pins.appendChild(mapFragments);
     };

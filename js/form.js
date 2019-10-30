@@ -12,7 +12,7 @@
     bungalo: 0,
     flat: 1000,
     house: 5000,
-    palace: 10000,
+    palace: 10000
   };
 
   var CHECK_TIME = [
@@ -31,23 +31,26 @@
   };
 
   var adFormRoomNumberValidity = function () {
-    var tempArray = ROOMS_VS_GUESTS[adFormRoomNumber.value];
+    var guestsAmount = ROOMS_VS_GUESTS[adFormRoomNumber.value];
+
     for (var i = 0; i < adFormCapacity.length; i++) {
       adFormCapacity[i].disabled = true;
-      for (var j = 0; j < tempArray.length; j++) {
-        if (+adFormCapacity[i].value === tempArray[j]) {
+      adFormCapacity[i].selected = false;
+      guestsAmount.forEach(function (amount) {
+        if (+adFormCapacity[i].value === amount) {
           adFormCapacity[i].disabled = false;
+          adFormCapacity[i].selected = true;
         }
-      }
+      });
     }
   };
 
   var adFormTimeValidity = function (shiftTimeIn, shiftTimeOut) {
-    for (var i = 0; i < CHECK_TIME.length; i++) {
-      if (shiftTimeIn.value === CHECK_TIME[i]) {
-        shiftTimeOut.value = CHECK_TIME[i];
+    CHECK_TIME.forEach(function (checkTime) {
+      if (shiftTimeIn.value === checkTime) {
+        shiftTimeOut.value = checkTime;
       }
-    }
+    });
   };
 
   var adFormType = document.querySelector('#type');
@@ -92,9 +95,9 @@
 
     adForm.classList.toggle('ad-form--disabled', status);
 
-    for (var i = 0; i < adFormFieldset.length; i++) {
-      adFormFieldset[i].disabled = status;
-    }
+    adFormFieldset.forEach(function (fieldset) {
+      fieldset.disabled = status;
+    });
     window.disabledStatusForm = !status;
   };
 
@@ -129,13 +132,17 @@
     document.querySelector('main').appendChild(errorElement);
   };
 
-  var onSuccess = function () {
-    document.querySelector('main').appendChild(successElement);
+  var reset = function () {
     adFormTitle.value = '';
     adFormDescription.value = '';
     adFormPrice.value = '';
-    adFormDisabled(window.disabledStatusForm);
+    var features = document.querySelector('.features').querySelectorAll('input');
+    features.forEach(function (feature) {
+      feature.checked = false;
+    });
+
     mapFaded();
+    adFormDisabled(window.disabledStatusForm);
     window.closeCard();
 
     document.addEventListener('click', function () {
@@ -148,6 +155,11 @@
         errorElement.remove();
       }
     });
+  };
+
+  var onSuccess = function () {
+    document.querySelector('main').appendChild(successElement);
+    reset();
   };
 
   var mapFaded = function () {
@@ -170,4 +182,7 @@
 
   window.setAddressInput = setAddressInput;
   window.adFormDisabled = adFormDisabled;
+
+  var resetButton = document.querySelector('.ad-form__reset');
+  resetButton.addEventListener('click', reset);
 })();
