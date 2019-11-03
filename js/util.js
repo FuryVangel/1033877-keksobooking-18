@@ -7,16 +7,16 @@
   window.MAIN_PIN_WIDTH = 65;
   window.MAIN_PIN_HEIGHT = 81;
 
-  window.HEIGHT_LIMIT = {
-    min: 130,
-    max: 630
+  window.HeightLimit = {
+    MIN: 130,
+    MAX: 630
   };
 
-  window.ADVERT_APARTMENT = {
-    flat: 'Квартира',
-    bungalo: 'Бунгало',
-    house: 'Дом',
-    palace: 'Дворец'
+  window.AdvertApartment = {
+    FLAT: 'Квартира',
+    BUNGALO: 'Бунгало',
+    HOUSE: 'Дом',
+    PALACE: 'Дворец'
   };
 
   window.map = document.querySelector('.map');

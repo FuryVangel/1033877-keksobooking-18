@@ -21,16 +21,16 @@
           x = -window.MAIN_PIN_WIDTH / 2;
         }
 
-        if (y < window.HEIGHT_LIMIT.min - window.MAIN_PIN_HEIGHT) {
-          y = window.HEIGHT_LIMIT.min - window.MAIN_PIN_HEIGHT;
+        if (y < window.HeightLimit.MIN - window.MAIN_PIN_HEIGHT) {
+          y = window.HeightLimit.MIN - window.MAIN_PIN_HEIGHT;
         }
 
         if (x > window.map.offsetWidth - window.MAIN_PIN_WIDTH / 2) {
           x = window.map.offsetWidth - window.MAIN_PIN_WIDTH / 2;
         }
 
-        if (y > window.HEIGHT_LIMIT.max - window.MAIN_PIN_HEIGHT) {
-          y = window.HEIGHT_LIMIT.max - window.MAIN_PIN_HEIGHT;
+        if (y > window.HeightLimit.MAX - window.MAIN_PIN_HEIGHT) {
+          y = window.HeightLimit.MAX - window.MAIN_PIN_HEIGHT;
         }
 
         window.mainPin.style.top = y + 'px';
@@ -52,9 +52,12 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  window.mainPin.addEventListener('keydown', function (evt) {
+  var onMainPinEnterPress = function (evt) {
     if (evt.keyCode === window.ENTER_KEYCODE) {
       window.mapRender();
     }
-  });
+    window.mainPin.removeEventListener('keydown', onMainPinEnterPress);
+  };
+
+  window.mainPin.addEventListener('keydown', onMainPinEnterPress);
 })();

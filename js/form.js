@@ -8,29 +8,29 @@
     100: [0]
   };
 
-  var ADVERT_MIN_PRICE = {
-    bungalo: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000
+  var AdvertMinPrice = {
+    BUNGALO: 0,
+    FLAT: 1000,
+    HOUSE: 5000,
+    PALACE: 10000
   };
 
-  var CHECK_TIME = [
+  var ARRIVAL_TIMES = [
     '12:00',
     '13:00',
     '14:00'
   ];
 
-  var adFormTypeValidity = function () {
-    for (var key in window.ADVERT_APARTMENT) {
-      if (adFormType.value === key) {
-        adFormPrice.placeholder = ADVERT_MIN_PRICE[key];
-        adFormPrice.min = ADVERT_MIN_PRICE[key];
+  var validateInputFormType = function () {
+    for (var key in window.AdvertApartment) {
+      if (adFormType.value.toUpperCase() === key) {
+        adFormPrice.placeholder = AdvertMinPrice[key];
+        adFormPrice.min = AdvertMinPrice[key];
       }
     }
   };
 
-  var adFormRoomNumberValidity = function () {
+  var validateInputFormRoomNumber = function () {
     var guestsAmount = ROOMS_VS_GUESTS[adFormRoomNumber.value];
 
     for (var i = 0; i < adFormCapacity.length; i++) {
@@ -45,10 +45,10 @@
     }
   };
 
-  var adFormTimeValidity = function (shiftTimeIn, shiftTimeOut) {
-    CHECK_TIME.forEach(function (checkTime) {
-      if (shiftTimeIn.value === checkTime) {
-        shiftTimeOut.value = checkTime;
+  var validateInputFormTime = function (shiftTimeIn, shiftTimeOut) {
+    ARRIVAL_TIMES.forEach(function (arrivalTime) {
+      if (shiftTimeIn.value === arrivalTime) {
+        shiftTimeOut.value = arrivalTime;
       }
     });
   };
@@ -63,21 +63,20 @@
   var adFormAddress = document.querySelector('#address');
   var adFormTitle = document.querySelector('#title');
 
-
   adFormType.addEventListener('input', function () {
-    adFormTypeValidity();
+    validateInputFormType();
   });
 
   adFormTimeIn.addEventListener('change', function () {
-    adFormTimeValidity(adFormTimeIn, adFormTimeOut);
+    validateInputFormTime(adFormTimeIn, adFormTimeOut);
   });
 
   adFormTimeOut.addEventListener('change', function () {
-    adFormTimeValidity(adFormTimeOut, adFormTimeIn);
+    validateInputFormTime(adFormTimeOut, adFormTimeIn);
   });
 
   adFormRoomNumber.addEventListener('change', function () {
-    adFormRoomNumberValidity();
+    validateInputFormRoomNumber();
   });
 
   var setAddressInput = function (x, y) {
@@ -85,7 +84,7 @@
     .value = Math.floor(parseInt(window.mainPin.style.left, 10) + x) + ', ' + Math.floor(parseInt(window.mainPin.style.top, 10) + y);
   };
 
-  var adFormDisabled = function (status) {
+  var addFormDisabled = function (status) {
 
     var adFormFieldset = adForm.querySelectorAll('fieldset');
     var mapFiltersFormFieldset = document.querySelector('.map__filters').querySelectorAll('select, fieldset');
@@ -101,8 +100,6 @@
     window.disabledStatusForm = !status;
   };
 
-  var URL = 'https://js.dump.academy/keksobooking';
-
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
   var errorElement = errorTemplate.cloneNode(true);
 
@@ -112,19 +109,23 @@
   var adForm = document.querySelector('.ad-form');
   adForm.addEventListener('submit', function (evt) {
     adFormAddress.disabled = false;
-    window.upload(URL, new FormData(adForm), onSuccess, onError);
+    window.backend.upload(new FormData(adForm), onSuccess, onError);
     adFormAddress.disabled = true;
     evt.preventDefault();
+
     document.addEventListener('click', function () {
       successElement.remove();
       errorElement.remove();
     });
-    document.addEventListener('keydown', function (e) {
+
+    var onPopupClose = function (e) {
       if (e.keyCode === window.ESC_KEYCODE) {
         successElement.remove();
         errorElement.remove();
+        document.removeEventListener('keydown', onPopupClose);
       }
-    });
+    };
+    document.addEventListener('keydown', onPopupClose);
   });
 
   var onError = function (message) {
@@ -136,33 +137,28 @@
     adFormTitle.value = '';
     adFormDescription.value = '';
     adFormPrice.value = '';
+    adFormPrice.placeholder = '1000';
+    adFormType.value = 'flat';
+    adFormRoomNumber.value = '1';
+    adFormCapacity.value = '1';
+    adFormTimeIn.value = '12:00';
+    adFormTimeOut.value = '12:00';
     var features = document.querySelector('.features').querySelectorAll('input');
     features.forEach(function (feature) {
       feature.checked = false;
     });
-
-    mapFaded();
-    adFormDisabled(window.disabledStatusForm);
+    addMapFaded();
+    addFormDisabled(window.disabledStatusForm);
     window.closeCard();
-
-    document.addEventListener('click', function () {
-      successElement.remove();
-      errorElement.remove();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.keyCode === window.ESC_KEYCODE) {
-        successElement.remove();
-        errorElement.remove();
-      }
-    });
   };
 
   var onSuccess = function () {
     document.querySelector('main').appendChild(successElement);
     reset();
+    successElement.focus();
   };
 
-  var mapFaded = function () {
+  var addMapFaded = function () {
     window.map.classList.add('map--faded');
     var pins = document.querySelectorAll('.map__pin');
     for (var i = 1; i < pins.length; i++) {
@@ -174,14 +170,14 @@
   };
 
   adFormAddress.disabled = true;
-  adFormRoomNumberValidity();
-  adFormTypeValidity();
+  validateInputFormRoomNumber();
+  validateInputFormType();
   window.disabledStatusForm = true;
-  adFormDisabled(window.disabledStatusForm);
+  addFormDisabled(window.disabledStatusForm);
   setAddressInput((window.MAIN_PIN_WIDTH / 2), (window.MAIN_PIN_WIDTH / 2));
 
   window.setAddressInput = setAddressInput;
-  window.adFormDisabled = adFormDisabled;
+  window.addFormDisabled = addFormDisabled;
 
   var resetButton = document.querySelector('.ad-form__reset');
   resetButton.addEventListener('click', reset);

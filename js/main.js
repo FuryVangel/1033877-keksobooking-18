@@ -11,12 +11,12 @@
 
     window.setAddressInput((window.MAIN_PIN_WIDTH / 2), window.MAIN_PIN_HEIGHT);
 
-    window.load('https://js.dump.academy/keksobooking/data', onSuccess, onError);
+    window.backend.load(onSuccess, onError);
   };
 
   window.mapRender = function () {
     if (!window.disabledStatusForm) {
-      window.adFormDisabled(window.disabledStatusForm);
+      window.addFormDisabled(window.disabledStatusForm);
       mapVisible();
     }
   };
@@ -28,28 +28,41 @@
     errorElement.querySelector('.error__message').textContent = message;
 
     document.querySelector('main').appendChild(errorElement);
+
+    var onErrorMessageEscClose = function (evt) {
+      if (evt.keyCode === window.ESC_KEYCODE) {
+        errorElement.remove();
+        document.removeEventListener('keydown', onErrorMessageEscClose);
+      }
+    };
+
+    document.addEventListener('keydown', onErrorMessageEscClose);
+
+    document.addEventListener('click', function () {
+      errorElement.remove();
+    });
   };
 
   window.closeCard = function () {
-    desactivatedPins();
+    deactivatedPins();
     var card = document.querySelector('.map__card');
     if (card) {
       window.map.removeChild(card);
     }
   };
 
-  var desactivatedPins = function () {
+  var deactivatedPins = function () {
     var pins = document.querySelectorAll('.map__pin');
-    for (var i = 1; i < pins.length; i++) {
-      pins[i].classList.remove('map__pin--active');
-    }
+    pins.forEach(function (pin) {
+      pin.classList.remove('map__pin--active');
+    });
   };
 
   var onSuccess = function (data) {
     window.data = data;
     var advertVariants = data.slice(0, window.PINS_LIMIT);
 
-    window.drawingPins = function (adVariants) {
+    window.drawPins = function (adVariants) {
       adVariants.forEach(function (advert, i) {
         if (advert.offer) {
           mapFragments.appendChild(window.pins.renderPins(advert));
@@ -66,17 +79,21 @@
 
             var cardCloseButton = document.querySelector('.popup__close');
             cardCloseButton.addEventListener('mousedown', window.closeCard);
-            document.addEventListener('keydown', function (e) {
+
+            var onEscCloseCard = function (e) {
               if (e.keyCode === window.ESC_KEYCODE) {
                 window.closeCard();
+                document.removeEventListener('keydown', onEscCloseCard);
               }
-            });
+            };
+
+            document.addEventListener('keydown', onEscCloseCard);
           });
         }
       });
       var pins = document.querySelector('.map__pins');
       pins.appendChild(mapFragments);
     };
-    window.drawingPins(advertVariants);
+    window.drawPins(advertVariants);
   };
 })();
