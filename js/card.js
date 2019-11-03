@@ -8,7 +8,7 @@
     cardElement.querySelector('.popup__title').textContent = advertisment.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = advertisment.offer.address;
     cardElement.querySelector('.popup__text--price').textContent = advertisment.offer.price + '₽/ночь';
-    cardElement.querySelector('.popup__type').textContent = window.ADVERT_APARTMENT[advertisment.offer.type];
+    cardElement.querySelector('.popup__type').textContent = window.AdvertApartment[advertisment.offer.type];
     cardElement.querySelector('.popup__text--capacity').textContent = advertisment.offer.rooms + ' комнаты для ' + advertisment.offer.rooms + ' гостей';
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + advertisment.offer.checkin + ' выезд до ' + advertisment.offer.checkout;
     cardElement.querySelector('.popup__description').textContent = advertisment.offer.description;
