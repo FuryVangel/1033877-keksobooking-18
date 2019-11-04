@@ -32,17 +32,18 @@
 
   var validateInputFormRoomNumber = function () {
     var guestsAmount = ROOMS_VS_GUESTS[adFormRoomNumber.value];
+    var capacityOptions = adFormCapacity.querySelectorAll('option');
 
-    for (var i = 0; i < adFormCapacity.length; i++) {
-      adFormCapacity[i].disabled = true;
-      adFormCapacity[i].selected = false;
+    capacityOptions.forEach(function (it) {
+      it.disabled = true;
+      it.selected = false;
       guestsAmount.forEach(function (amount) {
-        if (+adFormCapacity[i].value === amount) {
-          adFormCapacity[i].disabled = false;
-          adFormCapacity[i].selected = true;
+        if (+it.value === amount) {
+          it.disabled = false;
+          it.selected = true;
         }
       });
-    }
+    });
   };
 
   var validateInputFormTime = function (shiftTimeIn, shiftTimeOut) {
