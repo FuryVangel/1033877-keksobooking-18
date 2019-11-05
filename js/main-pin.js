@@ -4,8 +4,6 @@
   window.mainPin = document.querySelector('.map__pin--main');
 
   window.mainPin.addEventListener('mousedown', function (evt) {
-    window.mapRender();
-
     evt.preventDefault();
 
     var shiftX = evt.pageX - window.mainPin.offsetLeft - window.map.offsetLeft;
@@ -42,11 +40,11 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
+      window.mapRender();
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
-
 
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
