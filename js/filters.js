@@ -25,24 +25,24 @@
 
   var filterInput = function (adFilteredElement) {
     return adFilteredElement.filter(function (e) {
-      return inputType.value === 'any' ? true : e.offer.type === inputType.value;
+      return inputType.value === 'any' || e.offer.type === inputType.value;
     })
     .filter(function (e) {
       var filteringPrice = PriceRange[inputPrice.value.toUpperCase()];
-      return filteringPrice ? e.offer.price >= filteringPrice.MIN && e.offer.price <= filteringPrice.MAX : true;
+      return !filteringPrice || e.offer.price >= filteringPrice.MIN && e.offer.price <= filteringPrice.MAX;
     })
     .filter(function (e) {
-      return inputRooms.value === 'any' ? true : e.offer.rooms === +inputRooms.value;
+      return inputRooms.value === 'any' || e.offer.rooms === +inputRooms.value;
     })
     .filter(function (e) {
-      return inputGuests.value === 'any' ? true : e.offer.guests === +inputGuests.value;
+      return inputGuests.value === 'any' || e.offer.guests === +inputGuests.value;
     })
     .filter(function (e) {
       return filterFeatures(inputFeatures).every(function (element) {
         return e.offer.features.includes(element.value);
       });
     })
-    .slice(0, window.PINS_LIMIT);
+    .slice(0, window.main.PINS_LIMIT);
   };
 
   var filterFeatures = function (features) {
@@ -56,12 +56,12 @@
   var updateAdverts = function () {
     var adFilteredElement = filterInput(window.data);
 
-    window.closeCard();
+    window.main.closeCard();
     var pins = document.querySelectorAll('.map__pin');
     for (var i = 1; i < pins.length; i++) {
       pins[i].remove();
     }
-    window.drawPins(adFilteredElement);
+    window.main.drawPins(adFilteredElement);
   };
 
   inputType.addEventListener('change', function () {
@@ -82,4 +82,12 @@
   inputFeatures.addEventListener('change', function () {
     window.debounce(updateAdverts)();
   });
+
+  window.filterInputs = {
+    inputType: inputType,
+    inputPrice: inputPrice,
+    inputRooms: inputRooms,
+    inputGuests: inputGuests,
+    inputFeatures: inputFeatures
+  };
 })();

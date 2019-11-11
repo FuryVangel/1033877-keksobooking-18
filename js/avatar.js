@@ -47,6 +47,15 @@
       }
     });
   };
+
+  var image = imagesContainer.appendChild(createImage());
+
   addPhoto(avatarChooser, avatarPreview);
-  addPhoto(imageChooser, imagesContainer.appendChild(createImage()));
+  addPhoto(imageChooser, image);
+  window.avatars = {
+    avatar: avatarChooser,
+    image: imageChooser,
+    avatarPreview: avatarPreview,
+    imagePreview: image
+  };
 })();

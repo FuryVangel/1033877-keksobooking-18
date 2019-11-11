@@ -22,7 +22,7 @@
   ];
 
   var validateInputFormType = function () {
-    for (var key in window.AdvertApartment) {
+    for (var key in window.util.AdvertApartment) {
       if (adFormType.value.toUpperCase() === key) {
         adFormPrice.placeholder = AdvertMinPrice[key];
         adFormPrice.min = AdvertMinPrice[key];
@@ -120,7 +120,7 @@
     });
 
     var onPopupClose = function (e) {
-      if (e.keyCode === window.ESC_KEYCODE) {
+      if (e.keyCode === window.util.ESC_KEYCODE) {
         successElement.remove();
         errorElement.remove();
         document.removeEventListener('keydown', onPopupClose);
@@ -150,7 +150,24 @@
     });
     addMapFaded();
     addFormDisabled(window.disabledStatusForm);
-    window.closeCard();
+    window.main.closeCard();
+    validateInputFormRoomNumber();
+    window.avatars.avatar.value = '';
+    window.avatars.image.value = '';
+    window.avatars.avatarPreview.src = 'img/muffin-grey.svg';
+    window.avatars.imagePreview.src = '';
+
+    var filterReset = function () {
+      window.filterInputs.inputType.value = 'any';
+      window.filterInputs.inputPrice.value = 'any';
+      window.filterInputs.inputRooms.value = 'any';
+      window.filterInputs.inputGuests.value = 'any';
+      window.filterInputs.inputFeatures.querySelectorAll('input').forEach(function (feature) {
+        feature.checked = false;
+      });
+    };
+
+    filterReset();
   };
 
   var onSuccess = function () {
@@ -160,14 +177,14 @@
   };
 
   var addMapFaded = function () {
-    window.map.classList.add('map--faded');
+    window.util.map.classList.add('map--faded');
     var pins = document.querySelectorAll('.map__pin');
     for (var i = 1; i < pins.length; i++) {
       pins[i].remove();
     }
-    window.mainPin.style.top = window.map.offsetHeight / 2 + 'px';
-    window.mainPin.style.left = window.map.offsetWidth / 2 - window.MAIN_PIN_WIDTH / 2 + 'px';
-    setAddressInput((window.MAIN_PIN_WIDTH / 2), (window.MAIN_PIN_WIDTH / 2));
+    window.mainPin.style.top = window.util.map.offsetHeight / 2 + 'px';
+    window.mainPin.style.left = window.util.map.offsetWidth / 2 - window.util.MAIN_PIN_WIDTH / 2 + 'px';
+    setAddressInput((window.util.MAIN_PIN_WIDTH / 2), (window.util.MAIN_PIN_WIDTH / 2));
   };
 
   adFormAddress.disabled = true;
@@ -175,7 +192,7 @@
   validateInputFormType();
   window.disabledStatusForm = true;
   addFormDisabled(window.disabledStatusForm);
-  setAddressInput((window.MAIN_PIN_WIDTH / 2), (window.MAIN_PIN_WIDTH / 2));
+  setAddressInput((window.util.MAIN_PIN_WIDTH / 2), (window.util.MAIN_PIN_WIDTH / 2));
 
   window.setAddressInput = setAddressInput;
   window.addFormDisabled = addFormDisabled;

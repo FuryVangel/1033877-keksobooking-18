@@ -1,23 +1,25 @@
 'use strict';
 
 (function () {
-  window.ENTER_KEYCODE = 13;
-  window.ESC_KEYCODE = 27;
+  window.util = {
+    ENTER_KEYCODE: 13,
+    ESC_KEYCODE: 27,
 
-  window.MAIN_PIN_WIDTH = 65;
-  window.MAIN_PIN_HEIGHT = 81;
+    MAIN_PIN_WIDTH: 65,
+    MAIN_PIN_HEIGHT: 81,
 
-  window.HeightLimit = {
-    MIN: 130,
-    MAX: 630
+    HeightLimit: {
+      MIN: 130,
+      MAX: 630
+    },
+
+    AdvertApartment: {
+      FLAT: 'Квартира',
+      BUNGALO: 'Бунгало',
+      HOUSE: 'Дом',
+      PALACE: 'Дворец'
+    },
+
+    map: document.querySelector('.map')
   };
-
-  window.AdvertApartment = {
-    FLAT: 'Квартира',
-    BUNGALO: 'Бунгало',
-    HOUSE: 'Дом',
-    PALACE: 'Дворец'
-  };
-
-  window.map = document.querySelector('.map');
 })();

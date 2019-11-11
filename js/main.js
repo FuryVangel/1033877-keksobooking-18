@@ -1,20 +1,20 @@
 'use strict';
 
 (function () {
-  window.PINS_LIMIT = 5;
+  var PINS_LIMIT = 5;
 
   var mapFragments = document.createDocumentFragment();
   var cardsFragment = document.createDocumentFragment();
 
   var mapVisible = function () {
-    window.map.classList.remove('map--faded');
+    window.util.map.classList.remove('map--faded');
 
-    window.setAddressInput((window.MAIN_PIN_WIDTH / 2), window.MAIN_PIN_HEIGHT);
+    window.setAddressInput((window.util.MAIN_PIN_WIDTH / 2), window.util.MAIN_PIN_HEIGHT);
 
     window.backend.load(onSuccess, onError);
   };
 
-  window.mapRender = function () {
+  var mapRender = function () {
     if (!window.disabledStatusForm) {
       window.addFormDisabled(window.disabledStatusForm);
       mapVisible();
@@ -30,7 +30,7 @@
     document.querySelector('main').appendChild(errorElement);
 
     var onErrorMessageEscClose = function (evt) {
-      if (evt.keyCode === window.ESC_KEYCODE) {
+      if (evt.keyCode === window.util.ESC_KEYCODE) {
         errorElement.remove();
         document.removeEventListener('keydown', onErrorMessageEscClose);
       }
@@ -43,11 +43,11 @@
     });
   };
 
-  window.closeCard = function () {
+  var closeCard = function () {
     deactivatedPins();
     var card = document.querySelector('.map__card');
     if (card) {
-      window.map.removeChild(card);
+      window.util.map.removeChild(card);
     }
   };
 
@@ -58,42 +58,50 @@
     });
   };
 
+  var drawPins = function (adVariants) {
+    adVariants.forEach(function (advert, i) {
+      if (advert.offer) {
+        mapFragments.appendChild(window.pins.renderPins(advert));
+        mapFragments.childNodes[i].addEventListener('click', function (evt) {
+
+          closeCard();
+
+          var pin = evt.target.closest('.map__pin');
+          pin.classList.add('map__pin--active');
+
+          cardsFragment.appendChild(window.renderCard(advert));
+
+          window.util.map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
+
+          var cardCloseButton = document.querySelector('.popup__close');
+          cardCloseButton.addEventListener('mousedown', closeCard);
+
+          var onEscCloseCard = function (e) {
+            if (e.keyCode === window.util.ESC_KEYCODE) {
+              closeCard();
+              document.removeEventListener('keydown', onEscCloseCard);
+            }
+          };
+
+          document.addEventListener('keydown', onEscCloseCard);
+        });
+      }
+    });
+    var pins = document.querySelector('.map__pins');
+    pins.appendChild(mapFragments);
+  };
+
   var onSuccess = function (data) {
     window.data = data;
-    var advertVariants = data.slice(0, window.PINS_LIMIT);
+    var advertVariants = data.slice(0, PINS_LIMIT);
 
-    window.drawPins = function (adVariants) {
-      adVariants.forEach(function (advert, i) {
-        if (advert.offer) {
-          mapFragments.appendChild(window.pins.renderPins(advert));
-          mapFragments.childNodes[i].addEventListener('click', function (evt) {
+    drawPins(advertVariants);
+  };
 
-            window.closeCard();
-
-            var pin = evt.target.closest('.map__pin');
-            pin.classList.add('map__pin--active');
-
-            cardsFragment.appendChild(window.renderCard(advert));
-
-            window.map.insertBefore(cardsFragment, document.querySelector('.map__filters-container'));
-
-            var cardCloseButton = document.querySelector('.popup__close');
-            cardCloseButton.addEventListener('mousedown', window.closeCard);
-
-            var onEscCloseCard = function (e) {
-              if (e.keyCode === window.ESC_KEYCODE) {
-                window.closeCard();
-                document.removeEventListener('keydown', onEscCloseCard);
-              }
-            };
-
-            document.addEventListener('keydown', onEscCloseCard);
-          });
-        }
-      });
-      var pins = document.querySelector('.map__pins');
-      pins.appendChild(mapFragments);
-    };
-    window.drawPins(advertVariants);
+  window.main = {
+    PINS_LIMIT: PINS_LIMIT,
+    closeCard: closeCard,
+    mapRender: mapRender,
+    drawPins: drawPins
   };
 })();
